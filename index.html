@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة غيابات الطلبة - كلية الحقوق والعلوم السياسية</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="logos">
+                <!-- User can replace src with actual logos -->
+                <div class="logo-placeholder" title="شعار الجامعة">
+                    <img id="univ-logo" src="" alt="شعار الجامعة">
+                    <i class="fa-solid fa-building-columns placeholder-icon"></i>
+                </div>
+                <div class="header-titles">
+                    <h1>جامعة محمد بوضياف بالمسيلة</h1>
+                    <h2>كلية الحقوق والعلوم السياسية</h2>
+                    <p class="app-title">نظام إدارة ومتابعة غيابات الطلبة</p>
+                </div>
+                <div class="logo-placeholder" title="شعار الكلية">
+                    <img id="faculty-logo" src="" alt="شعار الكلية">
+                    <i class="fa-solid fa-scale-balanced placeholder-icon"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <button class="nav-btn active" data-target="dashboard"><i class="fa-solid fa-chart-line"></i> لوحة القيادة</button>
+            <button class="nav-btn" data-target="employees-panel"><i class="fa-solid fa-users-gear"></i> لوحة الموظفين (إدخال البيانات)</button>
+            <button class="nav-btn" data-target="records-panel"><i class="fa-solid fa-folder-open"></i> الأرشيف والسجلات</button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            
+            <!-- Dashboard View -->
+            <section id="dashboard" class="view-section active">
+                <div class="dashboard-cards">
+                    <div class="card glass">
+                        <div class="card-icon"><i class="fa-solid fa-user-graduate"></i></div>
+                        <div class="card-info">
+                            <h3>إجمالي الغيابات المسجلة</h3>
+                            <p id="total-absences">0</p>
+                        </div>
+                    </div>
+                    <div class="card glass">
+                        <div class="card-icon"><i class="fa-solid fa-calendar-day"></i></div>
+                        <div class="card-info">
+                            <h3>غيابات هذا الشهر</h3>
+                            <p id="monthly-absences">0</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="recent-records glass mt-20">
+                    <h3><i class="fa-solid fa-clock-rotate-left"></i> أحدث التسجيلات</h3>
+                    <div class="table-responsive">
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>الرقم التسلسلي</th>
+                                    <th>الاسم واللقب</th>
+                                    <th>المستوى</th>
+                                    <th>تاريخ التسجيل</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recent-tbody">
+                                <!-- Data injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Employees Panel (Data Entry) -->
+            <section id="employees-panel" class="view-section">
+                <div class="form-container glass">
+                    <h3><i class="fa-solid fa-file-signature"></i> إدخال بيانات غياب جديدة</h3>
+                    <form id="absence-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="serial-number">الرقم التسلسلي للإنجاز</label>
+                                <input type="text" id="serial-number" readonly class="readonly-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="record-date">تاريخ الإدخال</label>
+                                <input type="text" id="record-date" readonly class="readonly-input">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="last-name">اللقب <span class="required">*</span></label>
+                                <input type="text" id="last-name" required placeholder="أدخل لقب الطالب">
+                            </div>
+                            <div class="form-group">
+                                <label for="first-name">الاسم <span class="required">*</span></label>
+                                <input type="text" id="first-name" required placeholder="أدخل اسم الطالب">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="reg-number">رقم التسجيل <span class="required">*</span></label>
+                                <input type="text" id="reg-number" required placeholder="مثال: 202312345678">
+                            </div>
+                            <div class="form-group">
+                                <label for="bac-year">عام البكالوريا <span class="required">*</span></label>
+                                <input type="number" id="bac-year" required placeholder="مثال: 2021" min="1990" max="2100">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="level">المستوى <span class="required">*</span></label>
+                                <select id="level" required>
+                                    <option value="" disabled selected>اختر المستوى</option>
+                                    <option value="ليسانس - السنة الأولى">ليسانس - السنة الأولى</option>
+                                    <option value="ليسانس - السنة الثانية">ليسانس - السنة الثانية</option>
+                                    <option value="ليسانس - السنة الثالثة">ليسانس - السنة الثالثة</option>
+                                    <option value="ماستر - السنة الأولى">ماستر - السنة الأولى</option>
+                                    <option value="ماستر - السنة الثانية">ماستر - السنة الثانية</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="academic-year">السنة الدراسية <span class="required">*</span></label>
+                                <input type="text" id="academic-year" required placeholder="مثال: 2023/2024">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="absence-duration">مدة الغياب (بالأيام) <span class="required">*</span></label>
+                                <input type="number" id="absence-duration" required min="1" placeholder="مثال: 3">
+                            </div>
+                            <div class="form-group">
+                                <label for="certificate-issuer">الشهادة الطبية/شهادة الغياب صادرة عن <span class="required">*</span></label>
+                                <input type="text" id="certificate-issuer" required placeholder="مثال: مستشفى الزهراوي / الطبيب فلان">
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary"><i class="fa-solid fa-save"></i> حفظ السجل</button>
+                            <button type="reset" class="btn-secondary"><i class="fa-solid fa-eraser"></i> تفريغ الحقول</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Records Panel -->
+            <section id="records-panel" class="view-section">
+                <div class="records-container glass">
+                    <div class="records-header">
+                        <h3><i class="fa-solid fa-box-archive"></i> أرشيف الغيابات</h3>
+                        <div class="search-box">
+                            <input type="text" id="search-input" placeholder="بحث بالاسم أو رقم التسجيل...">
+                            <i class="fa-solid fa-search"></i>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>الرقم التسلسلي</th>
+                                    <th>اللقب والاسم</th>
+                                    <th>رقم التسجيل</th>
+                                    <th>المستوى</th>
+                                    <th>المدة</th>
+                                    <th>جهة الإصدار</th>
+                                    <th>إجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="records-tbody">
+                                <!-- Data injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <p>تصميم وإنجاز: أ.د/ بلواضح الطيب</p>
+        </footer>
+        
+        <!-- Toast Notification -->
+        <div id="toast" class="toast">تم حفظ البيانات بنجاح!</div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
