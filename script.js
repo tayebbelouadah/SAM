@@ -210,5 +210,133 @@ searchInput.addEventListener('input', (e) => {
     renderRecordsTable(e.target.value);
 });
 
-// Run Init
-document.addEventListener('DOMContentLoaded', initApp);
+// Database (Export/Import) Logic
+const btnExportExcel = document.getElementById('btn-export-excel');
+const btnExportBackup = document.getElementById('btn-export-backup');
+const importBackupInput = document.getElementById('import-backup');
+
+if (btnExportExcel) {
+    btnExportExcel.addEventListener('click', () => {
+        if (absences.length === 0) {
+            alert('لا توجد بيانات لتصديرها.');
+            return;
+        }
+        
+        const headers = ['الرقم التسلسلي', 'اللقب', 'الاسم', 'رقم التسجيل', 'عام البكالوريا', 'المستوى', 'السنة الدراسية', 'مدة الغياب', 'جهة الإصدار', 'تاريخ التسجيل'];
+        const csvRows = [];
+        csvRows.push(headers.join(','));
+        
+        absences.forEach(record => {
+            const row = [
+                record.serialNumber,
+                record.lastName,
+                record.firstName,
+                record.regNumber,
+                record.bacYear,
+                record.level,
+                record.academicYear,
+                record.duration,
+                record.issuer,
+                new Date(record.date).toLocaleDateString('ar-DZ')
+            ];
+            const escapedRow = row.map(field => `"${String(field).replace(/"/g, '""')}"`);
+            csvRows.push(escapedRow.join(','));
+        });
+        
+        const csvContent = csvRows.join('\n');
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `غيابات_الطلبة_${new Date().toISOString().split('T')[0]}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+    });
+}
+
+if (btnExportBackup) {
+    btnExportBackup.addEventListener('click', () => {
+        if (absences.length === 0) {
+            alert('لا توجد بيانات لأخذ نسخة احتياطية.');
+            return;
+        }
+        const jsonContent = JSON.stringify(absences, null, 2);
+        const blob = new Blob([jsonContent], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `backup_absences_${new Date().toISOString().split('T')[0]}.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+    });
+}
+
+if (importBackupInput) {
+    importBackupInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            try {
+                const importedData = JSON.parse(event.target.result);
+                if (Array.isArray(importedData)) {
+                    if (confirm('هل ترغب في دمج البيانات المستوردة مع البيانات الحالية؟\n\n- اختر "موافق" (OK) للدمج.\n- اختر "إلغاء" (Cancel) لمسح البيانات الحالية واستبدالها بالكامل.')) {
+                        const existingIds = new Set(absences.map(a => a.id));
+                        const newRecords = importedData.filter(a => !existingIds.has(a.id));
+                        absences = [...absences, ...newRecords];
+                    } else {
+                        absences = importedData;
+                    }
+                    saveData();
+                    updateDashboard();
+                    renderRecordsTable(searchInput.value);
+                    showToast('تم استيراد قاعدة البيانات بنجاح!');
+                } else {
+                    alert('ملف النسخة الاحتياطية غير صالح.');
+                }
+            } catch (error) {
+                alert('حدث خطأ أثناء قراءة الملف. تأكد من أنه ملف JSON صحيح.');
+            }
+            importBackupInput.value = '';
+        };
+        reader.readAsText(file);
+    });
+}
+
+// Login Logic
+const loginForm = document.getElementById('login-form');
+const loginContainer = document.getElementById('login-container');
+const appContainer = document.getElementById('app-container');
+const loginError = document.getElementById('login-error');
+
+function checkAuth() {
+    if (sessionStorage.getItem('isLoggedIn') === 'true') {
+        loginContainer.style.display = 'none';
+        appContainer.style.display = 'flex';
+        initApp();
+    } else {
+        loginContainer.style.display = 'flex';
+        appContainer.style.display = 'none';
+    }
+}
+
+if (loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const usernameInput = document.getElementById('username').value;
+        const passwordInput = document.getElementById('password').value;
+        
+        if (usernameInput === 'admin' && passwordInput === '1234') {
+            sessionStorage.setItem('isLoggedIn', 'true');
+            loginContainer.style.display = 'none';
+            appContainer.style.display = 'flex';
+            initApp();
+        } else {
+            loginError.style.display = 'block';
+        }
+    });
+}
+
+// Run Auth Check
+document.addEventListener('DOMContentLoaded', checkAuth);
