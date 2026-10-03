@@ -224,7 +224,7 @@ if (btnExportExcel) {
         
         const headers = ['الرقم التسلسلي', 'اللقب', 'الاسم', 'رقم التسجيل', 'عام البكالوريا', 'المستوى', 'السنة الدراسية', 'مدة الغياب', 'جهة الإصدار', 'تاريخ التسجيل'];
         const csvRows = [];
-        csvRows.push(headers.join(','));
+        csvRows.push(headers.join(';'));
         
         absences.forEach(record => {
             const row = [
@@ -240,7 +240,7 @@ if (btnExportExcel) {
                 new Date(record.date).toLocaleDateString('ar-DZ')
             ];
             const escapedRow = row.map(field => `"${String(field).replace(/"/g, '""')}"`);
-            csvRows.push(escapedRow.join(','));
+            csvRows.push(escapedRow.join(';'));
         });
         
         const csvContent = csvRows.join('\n');
@@ -248,9 +248,10 @@ if (btnExportExcel) {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `غيابات_الطلبة_${new Date().toISOString().split('T')[0]}.csv`;
+        link.download = `Absences_Export_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(link);
         link.click();
-        URL.revokeObjectURL(url);
+        document.body.removeChild(link);
     });
 }
 
